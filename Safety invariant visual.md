@@ -67,7 +67,7 @@ From `x₀`, the robot can reach a growing disk of states. After `t` steps, ever
             │         │
             ╰─────────╯
 
-  This growing disk is ℛ(t) — the reachable manifold.
+  This growing disk is ℛ(t) — the reachable set.
 
 ════════════════════════════════════════════════════════════════
 ```
@@ -162,7 +162,7 @@ If the robot’s reachable set grows but wraps *around* the obstacle:
 ════════════════════════════════════════════════════════════════
 ```
 
-The invariant holds. `ℛ(t) ∩ Ω = ∅`. Every trajectory from `x₀` under any admissible input stays outside the obstacle. The forbidden region is not avoided — it is *unreachable*.
+The invariant holds. `ℛ(t) ∩ Ω = ∅`. Every trajectory from `x₀` under any admissible input stays outside the obstacle. The forbidden region is outside the system’s reachable set.
 
 The hole in `ℛ` is not a limitation. It is the safety condition made visible.
 
@@ -212,13 +212,13 @@ The formal proof that this works — if `u_t ∈ A_safe(x_t)` for all `t`, then 
 |Zonotope propagation     |Over-approximate ℛ using zonotopes                         |Sound, scalable; conservative                       |
 |Monte Carlo sampling     |Sample trajectories; check if any enter Ω                  |Scalable; probabilistic, no formal guarantee        |
 
-The architecture is method-agnostic. Any technique that produces a sound estimate of `Reach(F(x_t, u_t), k) ∩ Ω` plugs into the guard.
+The architecture is method-agnostic. Any technique that produces a sound estimate of `Reach(F(x_t, u_t), k) ∩ Ω` plugs into the guard. In high-dimensional systems, `ℛ(t)` cannot be computed exactly. Practical guards operate on conservative over-approximations of `ℛ(t)`, which preserve the safety guarantee — if the over-approximation excludes Ω, the true reachable set does too.
 
 -----
 
 ## Step 6 — Identity from the Hole
 
-Something deeper happens when ℛ wraps around Ω. The reachable manifold acquires a *hole* — a topological feature that wasn’t there before.
+Something deeper happens when ℛ wraps around Ω. The reachable set acquires a *hole* — a topological feature that wasn’t there before.
 
 ```
 ════════════════════════════════════════════════════════════════
@@ -244,7 +244,7 @@ Something deeper happens when ℛ wraps around Ω. The reachable manifold acquir
 
 The forbidden region shapes the *identity* of the system. What you cannot reach defines the topology of what you are. The hole in ℛ is a structural feature of identity — the system’s reachable future has a shape, and that shape is determined by what is excluded.
 
-This is the Identity Invariant: `ℐ(x₀) = [ℛ(t)]_∼`. Identity is the equivalence class of the reachable manifold. The forbidden region is part of what makes the system *this* system and not some other one.
+This is the Identity Invariant: `ℐ(x₀) = [ℛ(t)]_∼`. Identity is the equivalence class of the reachable set. The forbidden region is part of what makes the system *this* system and not some other one.
 
 -----
 
@@ -261,8 +261,8 @@ This is the Identity Invariant: `ℐ(x₀) = [ℛ(t)]_∼`. Identity is the equi
 
   Invariant:  ℛ(t) ∩ Ω = ∅
 
-  Meaning:    Forbidden states are geometrically unreachable.
-              Not unlikely. Not monitored. Unreachable.
+  Meaning:    Forbidden states are outside the system's reachable set.
+              Not unlikely. Not monitored. Outside ℛ.
 
   Enforcement: Morrison Reachability Guard
                Checks before execution.
@@ -328,10 +328,10 @@ The Reachability Safety Invariant operates like this:
 
 This is structural. The unsafe state is never reached. Not because something caught it. Because the geometry of the system excludes it.
 
-|Approach              |What It Checks          |When                |Failure Mode                        |
-|:--------------------:|:----------------------:|:------------------:|:----------------------------------:|
-|Output filtering      |Text content            |After generation    |Jailbreaks bypass it                |
-|**Reachability Guard**|**State-space geometry**|**Before execution**|**Forbidden states are unreachable**|
+|Approach              |What It Checks          |When                |Failure Mode                      |
+|:--------------------:|:----------------------:|:------------------:|:--------------------------------:|
+|Output filtering      |Text content            |After generation    |Jailbreaks bypass it              |
+|**Reachability Guard**|**State-space geometry**|**Before execution**|**Forbidden states are outside ℛ**|
 
 -----
 
