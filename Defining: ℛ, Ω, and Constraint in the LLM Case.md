@@ -9,8 +9,6 @@
 ![Patent](https://img.shields.io/badge/Patent-GB2600765.8-0075ca?style=flat-square)
 ![©](https://img.shields.io/badge/©_2026-Davarn_Morrison-555555?style=flat-square)
 
-
-
 *“Safety is not a filter applied to output. It is a geometric property of the reachable set. Define ℛ. Define Ω. Prove they do not intersect. Everything else is commentary.”*
 
 *— Davarn Morrison, 2026*
@@ -51,9 +49,9 @@ Transitions are governed by a function T(s, a), where a represents admissible in
 
 In practice, ℛ can be approximated by sampling trajectories — sequences of prompts and outputs — and treating ℛ̂ as the set of states visited under those rollouts.
 
-Exact computation of ℛ is intractable in high-dimensional systems; therefore, practical implementations rely on conservative approximations ℛ̂ that over-approximate reachable states while preserving safety guarantees.
+Exact computation of ℛ is intractable in high-dimensional systems; therefore, practical implementations rely on conservative approximations ℛ̂ that over-approximate reachable states in a way that allows conservative safety guarantees. In practice, the system may be partially observable; therefore, constraints may be applied over observable projections or learned representations of state.
 
-This is a formal modelling perspective: a language model can be represented as a dynamical system with states, transitions, and a reachable set. ℛ is that set.
+This is a formal modelling perspective: a language model can be represented as a dynamical system with states, transitions, and a reachable set. ℛ denotes this set.
 
 -----
 
@@ -88,13 +86,13 @@ This separation is the entire point. Current approaches conflate the definition 
 
 The goal is not to eliminate unsafe outputs after they occur, but to eliminate the existence of trajectories that produce them.
 
-At a structural level, this corresponds to constraining the transition function T such that for all admissible transitions, T(s, a) ∉ Ω.
+At a structural level, this corresponds to constraining the transition function T such that for all reachable states s ∈ ℛ and admissible inputs a ∈ A_adm, the transition T(s, a) does not enter Ω.
 
 |Equation                               |Definition                                            |
 |:-------------------------------------:|:----------------------------------------------------:|
 |**A_safe(s) = { a ∈ A | T(s, a) ∉ Ω }**|Safe action set — only transitions that cannot reach Ω|
 
-One approach is to enforce constraints at the level of admissible transitions — using barrier functions or invariant constraints that prevent trajectories from entering Ω.
+One approach is to enforce constraints at the level of admissible transitions — using barrier functions or invariant constraints that prevent trajectories from entering Ω. This can be viewed as defining a constrained transition system T_safe, where admissible transitions are restricted to those that do not enter Ω.
 
 ### Practical Instantiation (LLM Case)
 
@@ -117,7 +115,7 @@ These are not competing approaches. They operate at different layers of the same
 |**ℛ**         |All internal and output states reachable through token transformations under admissible inputs|Approximated via conservative over-approximation ℛ̂                   |
 |**Ω**         |Subset of state space defined by explicit constraint functions under a specified safety policy|Classifiers, formal rules, or environment-defined failure conditions |
 |**T(s, a)**   |Transition function governing state evolution under admissible input a                        |Forward pass conditioned on input                                    |
-|**Constraint**|Restrict T such that ∀ admissible transitions, T(s, a) ∉ Ω                                    |Constrained decoding, latent safety layers, training-time penalties  |
+|**Constraint**|Restrict T such that ∀s ∈ ℛ, ∀a ∈ A_adm: T(s, a) ∉ Ω                                          |Constrained decoding, latent safety layers, training-time penalties  |
 |**Safety**    |**ℛ(t) ∩ Ω = ∅**                                                                              |Pre-semantic. Structural. Scale-invariant under enforced constraints.|
 
 The framework does not require exact knowledge of ℛ; it requires that the approximation used is sufficient to ensure that Ω is excluded from the reachable set under all admissible trajectories.
@@ -139,6 +137,8 @@ Current AI safety operates on outputs. The Morrison Framework operates on struct
 The question is not whether the output looks safe. The question is whether the system can reach unsafe states at all.
 
 In principle, if ℛ(t) ∩ Ω = ∅ is enforced, unsafe states are unreachable. In practice, this depends on the fidelity of the reachable set approximation.
+
+The central claim is not that unsafe behaviour can be reduced, but that unsafe states can be excluded from the space of possibilities under the system’s dynamics.
 
 -----
 
